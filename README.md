@@ -33,3 +33,35 @@ Run the included example from the command line:
 ```bash
 python binomial_model.py
 ```
+
+## Monte Carlo pricing with custom payoffs
+
+Use `monte_carlo.py` to simulate geometric Brownian motion paths and evaluate
+payoffs you provide as Python expressions. The helper `expression_payoff`
+accepts any formula involving the path (`path`) and NumPy (`np`). For example,
+to price an Asian call whose payoff depends on the average price over the path:
+
+```python
+from monte_carlo import MonteCarloParameters, expression_payoff, monte_carlo_price
+
+params = MonteCarloParameters(
+    spot=100,
+    rate=0.05,
+    time=1.0,
+    volatility=0.2,
+    paths=50_000,
+    steps=252,
+    seed=42,
+)
+
+payoff_expr = "np.maximum(np.mean(path) - 100, 0)"
+price = monte_carlo_price(params, expression_payoff(payoff_expr))
+print(price)
+```
+
+You can also run an interactive prompt to enter your own payoff expression and
+parameters:
+
+```bash
+python monte_carlo.py
+```
